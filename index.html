@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notester</title>
+  <style>
+    :root {
+      --desktop: #008080;
+      --window-bg: #c0c0c0;
+      --titlebar-bg: #000080;
+      --titlebar-text: #ffffff;
+      --border-light: #ffffff;
+      --border-mid: #c0c0c0;
+      --border-dark: #404040;
+      --text: #000000;
+    }
+
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: "MS Sans Serif", Tahoma, sans-serif;
+      background: var(--desktop);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1 { margin:0;padding:.5rem;text-align:center;font-size:1.25rem;background:var(--titlebar-bg);color:var(--titlebar-text);border-bottom:2px solid var(--border-dark);}  
+    #toolbar{padding:.5rem;background:var(--window-bg);border:2px solid var(--border-dark);border-top-color:var(--border-light);border-left-color:var(--border-light);display:flex;justify-content:center;gap:8px}
+    .win-btn{font-family:inherit;font-size:.85rem;padding:2px 8px;background:var(--window-bg);border:2px solid var(--border-dark);border-top-color:var(--border-light);border-left-color:var(--border-light);cursor:pointer}
+    .win-btn:active{border-top-color:var(--border-dark);border-left-color:var(--border-dark);border-bottom-color:var(--border-light);border-right-color:var(--border-light)}
+    .win-btn:disabled{opacity:.5;cursor:default}
+
+    #desktop{flex:1;position:relative;overflow:hidden}
+    .folder{position:absolute;width:240px;background:var(--window-bg);border:2px solid var(--border-mid);box-shadow:inset -1px -1px 0 var(--border-dark),inset 1px 1px 0 var(--border-light);display:flex;flex-direction:column;touch-action:none;user-select:none}
+    .folder-title{background:var(--titlebar-bg);color:var(--titlebar-text);padding:2px 4px;font-size:.9rem;display:flex;align-items:center;justify-content:space-between;cursor:move}
+    .folder-title span{pointer-events:none}
+    .close-btn{width:18px;height:18px;line-height:14px;text-align:center;font-weight:bold;color:var(--titlebar-text);background:none;border:1px solid var(--border-light);cursor:pointer;padding:0;margin-left:4px}
+    .close-btn:active{border-color:var(--border-dark)}
+    .folder-content{padding:4px;flex:1;display:flex;flex-direction:column}
+    .note{background:#fff;border:1px dotted var(--border-dark);padding:2px 4px;margin-bottom:4px;font-size:.8rem;white-space:pre-wrap}
+    textarea{width:100%;resize:vertical;font-family:inherit;font-size:.8rem;margin-bottom:4px}
+
+    /* confirm modal */
+    #confirmOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);align-items:center;justify-content:center}
+    .dialog{width:260px;background:var(--window-bg);border:2px solid var(--border-mid);box-shadow:inset -1px -1px 0 var(--border-dark),inset 1px 1px 0 var(--border-light);font-size:.85rem}
+    .dialog-title{background:var(--titlebar-bg);color:var(--titlebar-text);padding:2px 6px;font-weight:bold}
+    .dialog-content{padding:12px 8px}
+    .dialog-actions{display:flex;justify-content:center;gap:10px;padding:6px}
+  </style>
+</head>
+<body>
+  <h1>Notester</h1>
+  <div id="toolbar">
+    <button id="addFolderBtn" class="win-btn">New Folder</button>
+    <button id="undoBtn" class="win-btn" disabled>Undo Delete</button>
+  </div>
+  <div id="desktop"></div>
+
+  <!-- confirm dialog -->
+  <div id="confirmOverlay">
+    <div class="dialog">
+      <div class="dialog-title">Confirm</div>
+      <div class="dialog-content">Delete this folder?</div>
+      <div class="dialog-actions">
+        <button id="confirmYes" class="win-btn">Yes</button>
+        <button id="confirmNo"  class="win-btn">No</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let folderCount = 0;
+    const desktop   = document.getElementById('desktop');
+    const addBtn    = document.getElementById('addFolderBtn');
+    const undoBtn   = document.getElementById('undoBtn');
+    const undoStack = [];
+
+    /* ----- retro confirm modal helpers ----- */
+    const overlay   = document.getElementById('confirmOverlay');
+    const yesBtn    = document.getElementById('confirmYes');
+    const noBtn     = document.getElementById('confirmNo');
+    let pendingDel  = null;
+
+    function showConfirm(folder){ pendingDel = folder; overlay.style.display='flex'; yesBtn.focus(); }
+    function hideConfirm(){ overlay.style.display='none'; pendingDel=null; }
+    yesBtn.addEventListener('click',()=>{ if(pendingDel){ undoStack.push(pendingDel); pendingDel.remove(); updateUndo(); } hideConfirm(); });
+    noBtn.addEventListener('click', hideConfirm);
+
+    function updateUndo(){ undoBtn.disabled = undoStack.length === 0; }
+
+    /* ----- folder + note helpers ----- */
+    function addNote(folder){ const ta=folder.querySelector('textarea'); const txt=ta.value.trim(); if(!txt) return; const div=document.createElement('div'); div.className='note'; div.textContent=txt; folder.querySelector('.notes').appendChild(div); ta.value=''; }
+
+    function makeFolder(x=40,y=40){
+      folderCount++;
+      const folder=document.createElement('div');
+      folder.className='folder';
+      folder.style.left = x+'px';
+      folder.style.top  = y+'px';
+      folder.innerHTML=`<div class="folder-title"><span>Folder ${folderCount}</span><button class="close-btn" title="Delete">×</button></div><div class="folder-content"><textarea rows="3" placeholder="Write a note..."></textarea><button class="win-btn add-note-btn">Add Note</button><div class="notes"></div></div>`;
+
+      folder.querySelector('.add-note-btn').addEventListener('click',()=>addNote(folder));
+      folder.querySelector('.close-btn').addEventListener('click',e=>{e.stopPropagation();showConfirm(folder);});
+
+      /* drag */
+      const title=folder.querySelector('.folder-title');
+      let drag=false,offX=0,offY=0;
+      title.addEventListener('pointerdown',e=>{ if(e.target.closest('.close-btn')) return; drag=true; offX=e.clientX-folder.offsetLeft; offY=e.clientY-folder.offsetTop; folder.setPointerCapture(e.pointerId); folder.style.zIndex=Date.now(); });
+      folder.addEventListener('pointermove',e=>{ if(!drag) return; folder.style.left=(e.clientX-offX)+'px'; folder.style.top=(e.clientY-offY)+'px'; });
+      const stop=()=>{drag=false};
+      folder.addEventListener('pointerup',stop); folder.addEventListener('pointercancel',stop);
+
+      desktop.appendChild(folder);
+    }
+
+    /* ----- toolbar actions ----- */
+    addBtn.addEventListener('click',()=>{
+      const rect=desktop.getBoundingClientRect();
+      makeFolder(Math.random()*(rect.width-260)+20, Math.random()*(rect.height-220)+20);
+    });
+    undoBtn.addEventListener('click',()=>{ if(!undoStack.length) return; const folder=undoStack.pop(); desktop.appendChild(folder); updateUndo(); });
+
+    /* boot */
+    makeFolder(60,60);
+    updateUndo();
+  </script>
+</body>
+</html>
