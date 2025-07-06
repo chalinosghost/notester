@@ -1,16 +1,18 @@
 {
-  "name": "Notester",
-  "description": "Retro Win-95 style notes app",
-  "url": "https://notester.vercel.app",
-  "icons": [
-    {
-      "src": "https://notester.vercel.app/icon.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ],
   "accountAssociation": {
-    "signer": "",
-    "signature": ""
+    "header": "eyJmaWQiOjEwNzg0OTMsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHhCMkU0NTNmRTgzMzAwOTkzNDVEMUExNjdFQ2NFNjVBRDQwM2Q2MTU2In0",
+    "payload": "eyJkb21haW4iOiJub3Rlc3Rlci52ZXJjZWwuYXBwIn0",
+    "signature": "MHhkNDkzMTZlODNhMGUyNjJmZGE2ZDZmZGVmYjU0ZmUyOTkxMmVjNGFlMjYxNzc0NTgzMWIyZDU3MWIyYTNhM2NiMWRjMDZkN2ZhYzU1MjUyNjMyODY1ZmM5ZjYxZWRmMWRhOWY4ZDYxMTQ1Mzk2ZDAxMmZmODQ1ZTEyNTZjMjMyMzFi"
+  },
+  "frame": {
+    "version": "1",
+    "name": "Example Frame",
+    "iconUrl": "https://notester.vercel.app/icon.png",
+    "homeUrl": "https://notester.vercel.app",
+    "imageUrl": "https://notester.vercel.app/image.png",
+    "buttonTitle": "Check this out",
+    "splashImageUrl": "https://notester.vercel.app/splash.png",
+    "splashBackgroundColor": "#eeccff",
+    "webhookUrl": "https://notester.vercel.app/api/webhook"
   }
 }
