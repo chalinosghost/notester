@@ -1,0 +1,16 @@
+{
+  "name": "Notester",
+  "description": "Retro Win-95 style notes app",
+  "url": "https://notester.vercel.app",
+  "icons": [
+    {
+      "src": "https://notester.vercel.app/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "accountAssociation": {
+    "signer": "",
+    "signature": ""
+  }
+}
