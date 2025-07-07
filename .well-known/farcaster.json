@@ -5,7 +5,7 @@
     "signature": "MHhkNDkzMTZlODNhMGUyNjJmZGE2ZDZmZGVmYjU0ZmUyOTkxMmVjNGFlMjYxNzc0NTgzMWIyZDU3MWIyYTNhM2NiMWRjMDZkN2ZhYzU1MjUyNjMyODY1ZmM5ZjYxZWRmMWRhOWY4ZDYxMTQ1Mzk2ZDAxMmZmODQ1ZTEyNTZjMjMyMzFi"
   },
 
-  "version": "1.0.1", 
+  "version": "1.0.2", 
   "name": "Notester",
   "description": "Retro Win-95 notes app",
   "url": "https://notester.vercel.app",
