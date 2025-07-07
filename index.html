@@ -69,6 +69,13 @@
     </div>
   </div>
 
+  <!-- Farcaster Mini‑App ready handshake -->
+  <script type="module">
+    import { sdk } from "https://esm.sh/@farcaster/miniapps@latest";
+    // Tell Warpcast we’re ready so it hides the splash screen
+    sdk.actions.ready();
+  </script>
+
   <script>
     let folderCount = 0;
     const desktop   = document.getElementById('desktop');
